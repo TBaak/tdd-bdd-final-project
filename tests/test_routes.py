@@ -134,15 +134,15 @@ class TestProductRoutes(TestCase):
         # Uncomment this code once READ is implemented
         #
 
-        # # Check that the location header was correct
-        # response = self.client.get(location)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # new_product = response.get_json()
-        # self.assertEqual(new_product["name"], test_product.name)
-        # self.assertEqual(new_product["description"], test_product.description)
-        # self.assertEqual(Decimal(new_product["price"]), test_product.price)
-        # self.assertEqual(new_product["available"], test_product.available)
-        # self.assertEqual(new_product["category"], test_product.category.name)
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_product = response.get_json()
+        self.assertEqual(new_product["name"], test_product.name)
+        self.assertEqual(new_product["description"], test_product.description)
+        self.assertEqual(Decimal(new_product["price"]), test_product.price)
+        self.assertEqual(new_product["available"], test_product.available)
+        self.assertEqual(new_product["category"], test_product.category.name)
 
     def test_create_product_with_no_name(self):
         """It should not Create a Product without a name"""
@@ -166,6 +166,147 @@ class TestProductRoutes(TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    def test_get_product(self):
+        """ It should Get a product """
+        test_product = self._create_products(1)[0]
+        logging.debug("Test Product: %s", test_product.serialize())
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        # Assert that the status code is 200 OK
+        data = response.get_json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Assert that the data is equal to test_product
+        self.assertEqual(data['id'], test_product.id)
+        self.assertEqual(data['name'], test_product.name)
+
+    def test_get_product_that_does_not_exist(self):
+        """ It shouldn't Get a product that does not exist """
+        response = self.client.get(f"{BASE_URL}/1")
+        # Assert that the status code is 404 NOT FOUND
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_product(self):
+        """ It should Update a product """
+        test_product = self._create_products(1)[0]
+        logging.debug("Test Product: %s", test_product.serialize())
+        test_product.name = "Foo"
+        logging.debug("Updated test Product: %s", test_product.serialize())
+
+        response = self.client.put(f"{BASE_URL}/{test_product.id}", json=test_product.serialize())
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        products_response = self.client.get(f"{BASE_URL}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), 1)
+
+        updated_product_response = self.client.get(f"{BASE_URL}/{test_product.id}")
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(updated_product_response.status_code, status.HTTP_200_OK)
+        # Assert that the data is equal to test_product
+        updated_product = updated_product_response.get_json()
+        self.assertEqual(updated_product['id'], test_product.id)
+        self.assertEqual(updated_product['name'], test_product.name)
+
+    def test_update_product_that_does_not_exist(self):
+        """ It shouldn't Update a product that does not exist """
+        test_product = self._create_products(1)[0]
+
+        response = self.client.put(f"{BASE_URL}/1", json={})
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        products_response = self.client.get(f"{BASE_URL}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), 1)
+
+    def test_delete_product(self):
+        """ It should Delete a product """
+        test_product = self._create_products(1)[0]
+        logging.debug("Test Product: %s", test_product.serialize())
+
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        products_response = self.client.get(f"{BASE_URL}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), 0)
+
+    def test_delete_product_that_does_not_exist(self):
+        """ It shouldn't Delete a product that does not exist """
+        test_product = self._create_products(1)[0]
+
+        response = self.client.delete(f"{BASE_URL}/1")
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        products_response = self.client.get(f"{BASE_URL}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), 1)
+
+    def test_get_product_list(self):
+        """ It should Get a list of Products"""
+        products = self._create_products(5)
+
+        products_response = self.client.get(f"{BASE_URL}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), len(products))
+
+    def test_get_product_list_by_name(self):
+        """ It should Get a list of Products by name"""
+        products = self._create_products(5)
+
+        name = products[0].name
+        count = len([product for product in products if product.name == name])
+
+        products_response = self.client.get(f"{BASE_URL}?name={name}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), count)
+
+    def test_get_product_list_by_category(self):
+        """ It should Get a list of Products by category"""
+        products = self._create_products(5)
+
+        category = products[0].category
+        count = len([product for product in products if product.category.name == category.name])
+
+        products_response = self.client.get(f"{BASE_URL}?category={category.name}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), count)
+
+    def test_get_product_list_by_availability(self):
+        """ It should Get a list of Products by availability"""
+        products = self._create_products(5)
+
+        available = products[0].available
+        count = len([product for product in products if product.available == available])
+
+        products_response = self.client.get(f"{BASE_URL}?available={available}")
+        # Assert that the response status code is 200 OK
+        self.assertEqual(products_response.status_code, status.HTTP_200_OK)
+        # Assert that there is only one product in the DB
+        self.assertEqual(len(products_response.get_json()), count)
+
 
     ######################################################################
     # Utility functions
