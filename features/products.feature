@@ -18,11 +18,12 @@ Scenario: The server is running
 
 Scenario: Create a Product
     When I visit the "Home Page"
-    And I set the "Name" to "Hammer"
-    And I set the "Description" to "Claw hammer"
+    And I press the "Clear" button
+    And I change "Name" to "Hammer"
+    And I change "Description" to "Claw hammer"
     And I select "True" in the "Available" dropdown
     And I select "Tools" in the "Category" dropdown
-    And I set the "Price" to "34.95"
+    And I change "Price" to "34.95"
     And I press the "Create" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -41,7 +42,8 @@ Scenario: Create a Product
 
 Scenario: Read a Product
     When I visit the "Home Page"
-    And I set the "Name" to "Hat"
+    And I press the "Clear" button
+    And I change "Name" to "Hat"
     And I press the "Search" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -51,30 +53,32 @@ Scenario: Read a Product
     Then I should see the message "Success"
     And I should see "Hat" in the "Name" field
     And I should see "A red fedora" in the "Description" field
-    And I should see "True" in the "Available" field
-    And I should see "Cloths" in the "Category" field
+    And I should see "True" in the "Available" dropdown
+    And I should see "Cloths" in the "Category" dropdown
     And I should see "59.95" in the "Price" field
 
 Scenario: Update a Product
     When I visit the "Home Page"
-    And I set the "Name" to "Hat"
+    And I press the "Clear" button
+    And I change "Name" to "Hat"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "A red fedora" in the "Description" field
-    And I set the "Name" to "Fedora"
+    And I change "Name" to "Fedora"
     And I press the "Update" button
     Then I should see the message "Success"
     And I press the "Clear" button
-    And I set the "Name" to "Fedora"
+    And I change "Name" to "Fedora"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Fedora" in the "Name" field
-    And I should not see Hat" in the "Name" field
+    And I should not see "Hat" in the "Name" field
     And I should see "A red fedora" in the "Description" field
 
 Scenario: Delete a Product
     When I visit the "Home Page"
-    And I set the "Name" to "Hat"
+    And I press the "Clear" button
+    And I change "Name" to "Hat"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "A red fedora" in the "Description" field
@@ -90,6 +94,7 @@ Scenario: Delete a Product
 
 Scenario: List all products
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Hat" in the results
@@ -99,6 +104,7 @@ Scenario: List all products
 
 Scenario: Search by category:
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I select "Food" in the "Category" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
@@ -110,6 +116,7 @@ Scenario: Search by category:
 
 Scenario: Search by available:
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I select "True" in the "Available" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
@@ -119,9 +126,10 @@ Scenario: Search by available:
     And I should see "Sheets" in the results
 
 
-Scenario: Search by available:
+Scenario: Search by name:
     When I visit the "Home Page"
-    And I set the "Name" to "Hat"
+    And I press the "Clear" button
+    And I change "Name" to "Hat"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should not see "Big Mac" in the results

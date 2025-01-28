@@ -124,7 +124,14 @@ def step_impl(context, text_string, element_name):
     )
     assert(found)
 
+@then('I should not see "{text_string}" in the "{element_name}" field')
+def step_impl(context, text_string, element_name):
+    element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element = context.driver.find_element_by_id(element_id)
+    assert(text_string not in element.text)
+    
 @when('I change "{element_name}" to "{text_string}"')
+@then('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
     element = WebDriverWait(context.driver, context.wait_seconds).until(
@@ -132,3 +139,38 @@ def step_impl(context, element_name, text_string):
     )
     element.clear()
     element.send_keys(text_string)
+
+@when(u'I press the "{btn_name}" button')
+@then(u'I press the "{btn_name}" button')
+def step_impl(context, btn_name):
+    element_id = btn_name.lower() + '-btn'
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.click()
+
+
+@then(u'I should see the message "{message}"')
+def step_impl(context, message):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            message
+        )
+    )
+    assert(found)
+
+@then(u'I should not see "{text_string}" in the results')
+def step_impl(context, text_string):
+    element = context.driver.find_element_by_id('search_results')
+    assert(text_string not in element.text)
+
+@then(u'I should see "{text_string}" in the results')
+def step_impl(context, text_string):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'search_results'),
+            text_string
+        )
+    )
+    assert(found)
