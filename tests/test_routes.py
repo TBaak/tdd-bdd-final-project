@@ -214,7 +214,7 @@ class TestProductRoutes(TestCase):
 
     def test_update_product_that_does_not_exist(self):
         """ It shouldn't Update a product that does not exist """
-        test_product = self._create_products(1)[0]
+        _ = self._create_products(1)[0]
 
         response = self.client.put(f"{BASE_URL}/1", json={})
 
@@ -245,7 +245,7 @@ class TestProductRoutes(TestCase):
 
     def test_delete_product_that_does_not_exist(self):
         """ It shouldn't Delete a product that does not exist """
-        test_product = self._create_products(1)[0]
+        _ = self._create_products(1)[0]
 
         response = self.client.delete(f"{BASE_URL}/1")
 
@@ -306,7 +306,6 @@ class TestProductRoutes(TestCase):
         self.assertEqual(products_response.status_code, status.HTTP_200_OK)
         # Assert that there is only one product in the DB
         self.assertEqual(len(products_response.get_json()), count)
-
 
     ######################################################################
     # Utility functions

@@ -99,7 +99,11 @@ def create_products():
 
 @app.route("/products", methods=["GET"])
 def list_products():
-    app.logger.info(f"Request to Get Products...")
+    """
+    Fetches all products in the database
+    Optionally a search GET parameter can be given
+     """
+    app.logger.info("Request to Get Products...")
 
     name = request.args.get("name")
     category = request.args.get("category")
@@ -128,8 +132,12 @@ def list_products():
 # R E A D   A   P R O D U C T
 ######################################################################
 
+
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
+    """
+    Fetches a specific products in the database based on ID
+     """
     app.logger.info(f"Request to Get Product {product_id}...")
     product = Product.find(product_id)
     if product is None:
@@ -147,8 +155,12 @@ def get_products(product_id):
 # U P D A T E   A   P R O D U C T
 ######################################################################
 
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
+    """
+    Updates a products in the database based on ID
+     """
     app.logger.info(f"Request to Update Product {product_id}...")
     check_content_type("application/json")
 
@@ -172,8 +184,12 @@ def update_products(product_id):
 # D E L E T E   A   P R O D U C T
 ######################################################################
 
+
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_products(product_id):
+    """
+    Deletes a products in the database based on ID
+     """
     app.logger.info(f"Request to Delete Product {product_id}...")
 
     product = Product.find(product_id)
